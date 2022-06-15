@@ -83,11 +83,11 @@ function needsSignature(doclet) {
             }
         }
     }
-    // and namespaces that are functions get a signature (but finding them is a		
-    // bit messy)		
-    else if (doclet.kind === 'namespace' && doclet.meta && doclet.meta.code &&		
-        doclet.meta.code.type && doclet.meta.code.type.match(/[Ff]unction/)) {		
-        needsSig = true;		
+    // and namespaces that are functions get a signature (but finding them is a
+    // bit messy)
+    else if (doclet.kind === 'namespace' && doclet.meta && doclet.meta.code &&
+        doclet.meta.code.type && doclet.meta.code.type.match(/[Ff]unction/)) {
+        needsSig = true;
     }
 
     return needsSig;
@@ -318,7 +318,7 @@ function attachModuleSymbols(doclets, modules) {
     });
 }
 
-function buildMemberNav(items, itemHeading, itemsSeen, linktoFn) {
+function buildMemberNav(items, itemHeading, itemsSeen, linktoFn, isSectionOpen) {
     var nav = '';
 
     if (items && items.length) {
@@ -397,13 +397,28 @@ function buildMemberNav(items, itemHeading, itemsSeen, linktoFn) {
                     itemsNav += "</ul>";
                 }
 
+                if (item.children && item.children.length) {
+                    itemsNav += "<ul class='methods'>";
+
+                    item.children.forEach(function (child) {
+                        itemsNav += "<li data-type='method'";
+                        if(docdash.collapse)
+                            itemsNav += " style='display: none;'";
+                        itemsNav += ">";
+                        itemsNav += linktoFn('', child.longname);
+                        itemsNav += "</li>";
+                    });
+
+                    itemsNav += "</ul>";
+                }
+
                 itemsSeen[item.longname] = true;
             }
             itemsNav += '</li>';
         });
 
         if (itemsNav !== '') {
-            nav += '<h3>' + itemHeading + '</h3><ul>' + itemsNav + '</ul>';
+            nav += '<details '+ (isSectionOpen ? 'open' : '')+'><summary><h3>' + itemHeading + '</h3></summary><ul>' + itemsNav + '</ul></details>';
         }
     }
 
@@ -453,14 +468,14 @@ function buildNav(members) {
     ];
     var order = docdash.sectionOrder || defaultOrder;
     var sections = {
-        Classes: buildMemberNav(members.classes, 'Classes', seen, linkto),
-        Modules: buildMemberNav(members.modules, 'Modules', {}, linkto),
-        Externals: buildMemberNav(members.externals, 'Externals', seen, linktoExternal),
-        Events: buildMemberNav(members.events, 'Events', seen, linkto),
-        Namespaces: buildMemberNav(members.namespaces, 'Namespaces', seen, linkto),
-        Mixins: buildMemberNav(members.mixins, 'Mixins', seen, linkto),
-        Tutorials: buildMemberNav(members.tutorials, 'Tutorials', seenTutorials, linktoTutorial),
-        Interfaces: buildMemberNav(members.interfaces, 'Interfaces', seen, linkto),
+        Classes: buildMemberNav(members.classes, 'Classes', seen, linkto, order[0] === 'Classes'),
+        Modules: buildMemberNav(members.modules, 'Modules', {}, linkto, order[0] === 'Modules'),
+        Externals: buildMemberNav(members.externals, 'Externals', seen, linktoExternal, order[0] === 'Externals'),
+        Events: buildMemberNav(members.events, 'Events', seen, linkto, order[0] === 'Events'),
+        Namespaces: buildMemberNav(members.namespaces, 'Namespaces', seen, linkto, order[0] === 'Namespaces'),
+        Mixins: buildMemberNav(members.mixins, 'Mixins', seen, linkto, order[0] === 'Mixins'),
+        Tutorials: buildMemberNav(members.tutorials, 'Tutorials', seenTutorials, linktoTutorial, order[0] === 'Tutorials'),
+        Interfaces: buildMemberNav(members.interfaces, 'Interfaces', seen, linkto, order[0] === 'Interfaces'),
     };
     order.forEach(member => nav += sections[member]);
 
@@ -610,7 +625,7 @@ exports.publish = function(taffyData, opts, tutorials) {
             outdir = path.join.apply(null, subdirs);
         }
     }
-    
+
     fs.mkPath(outdir);
 
     // copy the template's static files to outdir
@@ -803,7 +818,7 @@ exports.publish = function(taffyData, opts, tutorials) {
     // tutorials can have only one parent so there is no risk for loops
     function saveChildren(node) {
         node.children.forEach(function(child) {
-            generateTutorial('Tutorial: ' + child.title, child, helper.tutorialToUrl(child.name));
+            generateTutorial(child.title, child, helper.tutorialToUrl(child.name));
             saveChildren(child);
         });
     }
