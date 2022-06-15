@@ -50,12 +50,14 @@
 </nav>
 
 <div id="main">
+     <?js= breadcrumbs ?>
+
     <?js if (title != 'Home') { ?>
     <h1 class="page-title"><?js= title ?></h1>
     <?js } ?>
 
     <?js= content ?>
-    
+
     <?js if (env.conf.docdash.disqus) { ?>
     <div id="disqus_thread"></div>
     <script>

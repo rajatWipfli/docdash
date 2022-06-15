@@ -763,3 +763,22 @@ html[data-search-mode] .level-hide {
     font-style: normal;
 
 }
+
+.breadcrumb {
+  display: flex;
+  list-style: none;
+  font-size: 0.9rem;
+}
+.breadcrumb-item:not(:first-child){
+    margin-left: 20px;
+    position: relative;
+}
+
+.breadcrumb-item:not(:first-child)::before{
+  content: '>';
+  font-size: 1.3em;
+  float: left;
+  position: absolute;
+  font-weight: bold;
+  left: -15px;
+}
