@@ -3,7 +3,12 @@ if (typeof fetch === 'function') {
     if (typeof scrollToNavItem !== 'function') return false
     scrollToNavItem()
     // hideAllButCurrent not always loaded
-    if (typeof hideAllButCurrent === 'function') hideAllButCurrent()
+    if (typeof hideAllButCurrent === 'function') hideAllButCurrent();
+
+    if (typeof activateSectionWithActiveLink === 'function') {
+      activateSectionWithActiveLink()
+      window.addEventListener('hashchange', activateSectionWithActiveLink);
+    }
     return true
   }
   fetch('./nav.inc.html')
@@ -16,11 +21,11 @@ if (typeof fetch === 'function') {
     .then(done => {
       if (done) return
       let i = 0
-      ;(function waitUntilNavJs () {
-        if (init()) return
-        if (i++ < 100) return setTimeout(waitUntilNavJs, 300)
-        console.error(Error('nav.js not loaded after 30s waiting for it'))
-      })()
+        ; (function waitUntilNavJs() {
+          if (init()) return
+          if (i++ < 100) return setTimeout(waitUntilNavJs, 300)
+          console.error(Error('nav.js not loaded after 30s waiting for it'))
+        })()
     })
     .catch(error => console.error(error))
 } else {

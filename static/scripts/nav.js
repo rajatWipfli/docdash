@@ -17,6 +17,9 @@ function getActiveNav(allNavs) {
 
 function activateSectionWithActiveLink() {
   const allNavs = document.querySelectorAll('nav a');
+  if (!allNavs.length) {
+    return;
+  }
   const activeLink = getActiveNav(allNavs);
   const parentSection = activeLink.closest('details');
   if (!parentSection) {
@@ -39,6 +42,4 @@ function delayNavActivation() {
 }
 
 scrollToNavItem();
-
-window.addEventListener('hashchange', activateSectionWithActiveLink);
-window.addEventListener('load', delayNavActivation);
+activateSectionWithActiveLink();
